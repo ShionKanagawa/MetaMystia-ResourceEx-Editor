@@ -15,3 +15,5 @@ next-env.d.ts
 /ResourceEx/
 
 private.pem
+
+copilot-instructions.md
