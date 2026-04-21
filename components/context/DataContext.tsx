@@ -14,6 +14,7 @@ import { saveAs } from 'file-saver';
 import { KNOWN_DEPENDENCIES } from '@/lib/constants';
 
 import type { ResourceEx } from '@/types/resource';
+import type { Dialog, DialogAction } from '@/types/resource';
 import { sortValues, trimCRLF } from './utils';
 
 interface DataContextType {
@@ -378,6 +379,36 @@ export function DataProvider({ children }: PropsWithChildren) {
 			// Sanitize data before export
 			const exportData = {
 				...data,
+				dialogPackages: data.dialogPackages.map((pkg) => ({
+					...pkg,
+					dialogList: pkg.dialogList.map((dlg): Dialog => {
+						const cleanedActions: DialogAction[] = (
+							dlg.actions ?? []
+						).map((act) => {
+							// Drop sprite when explicitly clearing (shouldSet=false)
+							// or for actions that don't carry a sprite.
+							if (act.actionType === 'CameraShake') {
+								return { actionType: act.actionType };
+							}
+							if (act.shouldSet === false) {
+								return {
+									actionType: act.actionType,
+									shouldSet: false,
+								};
+							}
+							return {
+								actionType: act.actionType,
+								...(act.sprite ? { sprite: act.sprite } : {}),
+							};
+						});
+						const { actions: _omit, ...rest } = dlg;
+						void _omit;
+						if (cleanedActions.length === 0) {
+							return rest;
+						}
+						return { ...rest, actions: cleanedActions };
+					}),
+				})),
 				characters: data.characters.map((char) => {
 					if (!char.guest) {
 						return char;
@@ -491,6 +522,15 @@ export function DataProvider({ children }: PropsWithChildren) {
 						if (p) usedPaths.add(p);
 					});
 				}
+			});
+
+			// 3. Dialog action sprites (CG/BG)
+			exportData.dialogPackages.forEach((pkg) => {
+				pkg.dialogList.forEach((dlg) => {
+					dlg.actions?.forEach((act) => {
+						if (act.sprite) usedPaths.add(act.sprite);
+					});
+				});
 			});
 
 			// Add only used assets

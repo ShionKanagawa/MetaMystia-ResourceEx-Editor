@@ -1,12 +1,13 @@
-import { memo } from 'react';
+import { memo, useCallback } from 'react';
 
 import { useData } from '@/components/context/DataContext';
+import { DialogActionsEditor } from './DialogActionsEditor';
 import { DialogFormFields } from './DialogFormFields';
 import { DialogItemHeader } from './DialogItemHeader';
 import { PortraitPreview } from './PortraitPreview';
 import { useDialogDisplay } from './useDialogDisplay';
 
-import type { Character, Dialog } from '@/types/resource';
+import type { Character, Dialog, DialogAction } from '@/types/resource';
 
 interface DialogItemProps {
 	dialog: Dialog;
@@ -26,6 +27,13 @@ export const DialogItem = memo<DialogItemProps>(function DialogItem({
 	const { portraitPath, charName, portraitName } = useDialogDisplay(
 		dialog,
 		customCharacters
+	);
+
+	const handleActionsChange = useCallback(
+		(actions: DialogAction[] | undefined) => {
+			onUpdate({ actions });
+		},
+		[onUpdate]
 	);
 
 	return (
@@ -65,6 +73,10 @@ export const DialogItem = memo<DialogItemProps>(function DialogItem({
 					onUpdate={onUpdate}
 				/>
 			</div>
+			<DialogActionsEditor
+				actions={dialog.actions}
+				onChange={handleActionsChange}
+			/>
 		</div>
 	);
 });

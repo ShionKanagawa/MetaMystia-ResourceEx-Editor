@@ -124,12 +124,30 @@ export interface Character {
 	spellCard?: SpellCard | undefined;
 }
 
+export type DialogActionType = 'CameraShake' | 'CG' | 'BG';
+
+/**
+ * 对话条目附加的运行时动作。
+ * - CameraShake: 触发一次镜头抖动，无额外字段。
+ * - CG / BG: 通过 sprite 设置一张图片，或将 shouldSet 置为 false 清空当前 CG/BG。
+ *   两个字段互斥：要么提供 sprite（默认 shouldSet 视为 true），要么 shouldSet=false 表示清空。
+ */
+export interface DialogAction {
+	actionType: DialogActionType;
+	/** CG/BG 资源的相对路径，例如 "assets/CG/black.png"。 */
+	sprite?: string | undefined;
+	/** 显式置为 false 表示清空 CG/BG。默认/缺省视为 true。 */
+	shouldSet?: boolean | undefined;
+}
+
 export interface Dialog {
 	characterId: number;
 	characterType: CharacterType;
 	pid: number;
 	position: 'Left' | 'Right';
 	text: string;
+	/** 可选的附加动作序列；空数组或 undefined 在导出时会被省略以兼容旧资源包。 */
+	actions?: DialogAction[] | undefined;
 }
 
 export interface DialogPackage {

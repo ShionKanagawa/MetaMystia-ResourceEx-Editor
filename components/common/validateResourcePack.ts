@@ -17,11 +17,18 @@ export interface ValidationIssue {
 /**
  * 对整个资源包进行全面验证，返回所有问题列表。
  * 不依赖 React hooks，签名验证为异步操作。
+ *
+ * @param data 待校验的资源包数据。
+ * @param availableAssetPaths 当前项目内已存在的资产路径集合（来自 DataContext.assetUrls）。
+ *   传入后可校验 dialog action 等模块对 sprite 的引用是否实际存在。
+ *   未传入时跳过资产存在性检查，保持向后兼容。
  */
 export async function validateResourcePack(
-	data: ResourceEx
+	data: ResourceEx,
+	availableAssetPaths?: Iterable<string>
 ): Promise<ValidationIssue[]> {
 	const issues: ValidationIssue[] = [];
+	const assetSet = availableAssetPaths ? new Set(availableAssetPaths) : null;
 	const packLabel = data.packInfo.label;
 	const prefix = packLabel ? `_${packLabel}_` : '';
 
@@ -196,6 +203,58 @@ export async function validateResourcePack(
 		}
 
 		checkLabelPrefix(pkg.name, '对话包', displayName);
+	});
+
+	// ── Dialog Action Sprites ─────────────────────────────
+	data.dialogPackages.forEach((pkg, pkgIndex) => {
+		const pkgName = pkg.name || `对话包#${pkgIndex + 1}`;
+		pkg.dialogList.forEach((dlg, dlgIndex) => {
+			(dlg.actions ?? []).forEach((act, actIndex) => {
+				const where = `${pkgName} 第 ${dlgIndex + 1} 条对话的动作 #${actIndex + 1}`;
+				const isSpriteAction =
+					act.actionType === 'CG' || act.actionType === 'BG';
+				if (!isSpriteAction) return;
+
+				const isClearing = act.shouldSet === false;
+				if (isClearing) {
+					if (act.sprite) {
+						issues.push({
+							severity: 'warning',
+							category: '对话动作',
+							message: `${where} (${act.actionType}) 标记为清空但仍带有 sprite 字段，导出时将会丢弃`,
+						});
+					}
+					return;
+				}
+
+				if (!act.sprite) {
+					issues.push({
+						severity: 'error',
+						category: '对话动作',
+						message: `${where} (${act.actionType}) 既未设置 sprite 也未标记清空`,
+					});
+					return;
+				}
+
+				const expectedFolder =
+					act.actionType === 'CG' ? 'assets/CG/' : 'assets/BG/';
+				if (!act.sprite.startsWith(expectedFolder)) {
+					issues.push({
+						severity: 'warning',
+						category: '对话动作',
+						message: `${where} 的 sprite "${act.sprite}" 未位于推荐目录 ${expectedFolder}`,
+					});
+				}
+
+				if (assetSet && !assetSet.has(act.sprite)) {
+					issues.push({
+						severity: 'error',
+						category: '对话动作',
+						message: `${where} 引用的资产 "${act.sprite}" 在当前项目中不存在`,
+					});
+				}
+			});
+		});
 	});
 
 	// ── Mission Nodes ─────────────────────────────────────

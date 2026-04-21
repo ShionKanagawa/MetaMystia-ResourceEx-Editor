@@ -81,7 +81,8 @@ const NavDropdown = memo(function NavDropdown({
 
 export const Header = memo(function Header() {
 	const pathname = usePathname();
-	const { data, createBlank, loadResourcePack, saveResourcePack } = useData();
+	const { data, assetUrls, createBlank, loadResourcePack, saveResourcePack } =
+		useData();
 	const [validationIssues, setValidationIssues] = useState<
 		ValidationIssue[] | null
 	>(null);
@@ -97,13 +98,13 @@ export const Header = memo(function Header() {
 	);
 
 	const handleExport = useCallback(async () => {
-		const issues = await validateResourcePack(data);
+		const issues = await validateResourcePack(data, Object.keys(assetUrls));
 		if (issues.length > 0) {
 			setValidationIssues(issues);
 		} else {
 			saveResourcePack();
 		}
-	}, [data, saveResourcePack]);
+	}, [data, assetUrls, saveResourcePack]);
 
 	const handleExportConfirm = useCallback(() => {
 		setValidationIssues(null);
@@ -205,6 +206,17 @@ export const Header = memo(function Header() {
 							)}
 						>
 							商人编辑
+						</Link>
+						<Link
+							href="/asset"
+							className={cn(
+								'btn-mystia',
+								pathname === '/asset'
+									? 'bg-black/5 hover:bg-black/10 dark:bg-white/5 dark:hover:bg-white/10'
+									: 'hover:bg-black/5 dark:hover:bg-white/5'
+							)}
+						>
+							资产
 						</Link>
 					</nav>
 				</div>
