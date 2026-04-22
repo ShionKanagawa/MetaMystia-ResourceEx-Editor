@@ -211,6 +211,40 @@ export async function validateResourcePack(
 		pkg.dialogList.forEach((dlg, dlgIndex) => {
 			(dlg.actions ?? []).forEach((act, actIndex) => {
 				const where = `${pkgName} 第 ${dlgIndex + 1} 条对话的动作 #${actIndex + 1}`;
+
+				if (act.actionType === 'Sound') {
+					if (!act.sound) {
+						issues.push({
+							severity: 'error',
+							category: '对话动作',
+							message: `${where} (Sound) 未设置 sound 路径`,
+						});
+						return;
+					}
+					if (!act.sound.startsWith('assets/Audio/')) {
+						issues.push({
+							severity: 'warning',
+							category: '对话动作',
+							message: `${where} 的 sound "${act.sound}" 未位于推荐目录 assets/Audio/`,
+						});
+					}
+					if (!act.sound.toLowerCase().endsWith('.wav')) {
+						issues.push({
+							severity: 'warning',
+							category: '对话动作',
+							message: `${where} 的 sound "${act.sound}" 不是 .wav 文件，MOD 目前仅支持 .wav`,
+						});
+					}
+					if (assetSet && !assetSet.has(act.sound)) {
+						issues.push({
+							severity: 'error',
+							category: '对话动作',
+							message: `${where} 引用的音频 "${act.sound}" 在当前项目中不存在`,
+						});
+					}
+					return;
+				}
+
 				const isSpriteAction =
 					act.actionType === 'CG' || act.actionType === 'BG';
 				if (!isSpriteAction) return;

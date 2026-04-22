@@ -7,17 +7,19 @@ import { cn } from '@/lib';
 
 import type { Dialog, DialogAction, DialogActionType } from '@/types/resource';
 
-const ACTION_TYPES: DialogActionType[] = ['CameraShake', 'CG', 'BG'];
+const ACTION_TYPES: DialogActionType[] = ['CameraShake', 'CG', 'BG', 'Sound'];
 
 const ACTION_LABEL: Record<DialogActionType, string> = {
 	CameraShake: '镜头抖动',
 	CG: 'CG',
 	BG: 'BG',
+	Sound: '音效',
 };
 
 const ACTION_FOLDER: Partial<Record<DialogActionType, string>> = {
 	CG: 'assets/CG/',
 	BG: 'assets/BG/',
+	Sound: 'assets/Audio/',
 };
 
 type SpriteMode = 'set' | 'clear';
@@ -29,6 +31,9 @@ function getSpriteMode(action: DialogAction): SpriteMode {
 function makeDefaultAction(type: DialogActionType): DialogAction {
 	if (type === 'CameraShake') {
 		return { actionType: type };
+	}
+	if (type === 'Sound') {
+		return { actionType: type, sound: '' };
 	}
 	return { actionType: type, sprite: '' };
 }
@@ -161,6 +166,7 @@ const DialogActionRow = memo<DialogActionRowProps>(function DialogActionRow({
 }) {
 	const isSpriteAction =
 		action.actionType === 'CG' || action.actionType === 'BG';
+	const isSoundAction = action.actionType === 'Sound';
 
 	return (
 		<div className="flex flex-col gap-2 rounded-md border border-black/10 bg-black/5 p-2 dark:border-white/10 dark:bg-white/5">
@@ -204,6 +210,9 @@ const DialogActionRow = memo<DialogActionRowProps>(function DialogActionRow({
 
 			{isSpriteAction && (
 				<SpriteActionFields action={action} onUpdate={onUpdate} />
+			)}
+			{isSoundAction && (
+				<SoundActionFields action={action} onUpdate={onUpdate} />
 			)}
 		</div>
 	);
@@ -340,3 +349,83 @@ const SpriteActionFields = memo<SpriteActionFieldsProps>(
 
 // Helper to keep Dialog typing consistent for callers that pass `Partial<Dialog>`
 export type DialogActionsPatch = Pick<Dialog, 'actions'>;
+
+interface SoundActionFieldsProps {
+	action: DialogAction;
+	onUpdate: (patch: Partial<DialogAction>) => void;
+}
+
+const SoundActionFields = memo<SoundActionFieldsProps>(
+	function SoundActionFields({ action, onUpdate }) {
+		const folder = ACTION_FOLDER.Sound ?? 'assets/Audio/';
+		const selectId = useId();
+
+		const { assetUrls, getAssetUrl } = useData();
+
+		const availableAssets = useMemo(() => {
+			return Object.keys(assetUrls)
+				.filter((path) => path.startsWith(folder))
+				.sort();
+		}, [assetUrls, folder]);
+
+		const previewUrl = action.sound ? getAssetUrl(action.sound) : undefined;
+
+		const isMissing =
+			!!action.sound && !availableAssets.includes(action.sound);
+
+		return (
+			<div className="flex flex-col gap-2">
+				<div className="flex flex-col gap-1">
+					<div className="flex items-center justify-between gap-2">
+						<Label
+							htmlFor={selectId}
+							className="text-xs normal-case opacity-70"
+						>
+							音频路径（来自 {folder}，仅支持 .wav）
+						</Label>
+						{isMissing && <WarningBadge>资产未注册</WarningBadge>}
+					</div>
+					<select
+						id={selectId}
+						value={action.sound ?? ''}
+						onChange={(e) => {
+							onUpdate({ sound: e.target.value || undefined });
+						}}
+						className={cn(
+							'h-8 w-full rounded-md border bg-white/40 px-2 text-xs outline-none focus:ring-2 focus:ring-black/10 dark:bg-black/10 dark:focus:ring-white/10',
+							isMissing
+								? 'border-warning'
+								: 'border-black/10 dark:border-white/10'
+						)}
+					>
+						<option value="">— 选择音频 —</option>
+						{isMissing && (
+							<option value={action.sound}>
+								{action.sound}（缺失）
+							</option>
+						)}
+						{availableAssets.map((path) => (
+							<option key={path} value={path}>
+								{path.slice(folder.length)}
+							</option>
+						))}
+					</select>
+					{availableAssets.length === 0 && (
+						<p className="text-[10px] opacity-50">
+							{folder} 下暂无音频，请前往「资产」页上传 .wav
+							文件。
+						</p>
+					)}
+				</div>
+				{previewUrl && (
+					<audio
+						controls
+						src={previewUrl}
+						className="h-8 w-full"
+						preload="none"
+					/>
+				)}
+			</div>
+		);
+	}
+);

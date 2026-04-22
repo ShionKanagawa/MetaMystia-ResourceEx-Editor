@@ -124,13 +124,14 @@ export interface Character {
 	spellCard?: SpellCard | undefined;
 }
 
-export type DialogActionType = 'CameraShake' | 'CG' | 'BG';
+export type DialogActionType = 'CameraShake' | 'CG' | 'BG' | 'Sound';
 
 /**
  * 对话条目附加的运行时动作。
  * - CameraShake: 触发一次镜头抖动，无额外字段。
  * - CG / BG: 通过 sprite 设置一张图片，或将 shouldSet 置为 false 清空当前 CG/BG。
  *   两个字段互斥：要么提供 sprite（默认 shouldSet 视为 true），要么 shouldSet=false 表示清空。
+ * - Sound: 通过 sound 播放一段音频（目前 MOD 仅支持 .wav）。
  */
 export interface DialogAction {
 	actionType: DialogActionType;
@@ -138,6 +139,8 @@ export interface DialogAction {
 	sprite?: string | undefined;
 	/** 显式置为 false 表示清空 CG/BG。默认/缺省视为 true。 */
 	shouldSet?: boolean | undefined;
+	/** Sound 资源的相对路径，例如 "assets/Audio/baka.wav"。 */
+	sound?: string | undefined;
 }
 
 export interface Dialog {

@@ -390,6 +390,12 @@ export function DataProvider({ children }: PropsWithChildren) {
 							if (act.actionType === 'CameraShake') {
 								return { actionType: act.actionType };
 							}
+							if (act.actionType === 'Sound') {
+								return {
+									actionType: act.actionType,
+									...(act.sound ? { sound: act.sound } : {}),
+								};
+							}
 							if (act.shouldSet === false) {
 								return {
 									actionType: act.actionType,
@@ -524,11 +530,12 @@ export function DataProvider({ children }: PropsWithChildren) {
 				}
 			});
 
-			// 3. Dialog action sprites (CG/BG)
+			// 3. Dialog action sprites (CG/BG) and audio (Sound)
 			exportData.dialogPackages.forEach((pkg) => {
 				pkg.dialogList.forEach((dlg) => {
 					dlg.actions?.forEach((act) => {
 						if (act.sprite) usedPaths.add(act.sprite);
+						if (act.sound) usedPaths.add(act.sound);
 					});
 				});
 			});

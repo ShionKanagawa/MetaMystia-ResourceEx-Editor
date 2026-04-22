@@ -15,6 +15,10 @@ interface AssetCategory {
 	/** 固定目录前缀。`null` 表示自由上传，不限定子目录。 */
 	folder: string | null;
 	description: string;
+	/** 该分类接受的资源类型，默认 image。 */
+	kind?: 'image' | 'audio';
+	/** <input accept> 值，默认根据 kind 选择。 */
+	accept?: string;
 }
 
 const FIXED_CATEGORIES: AssetCategory[] = [
@@ -31,6 +35,15 @@ const FIXED_CATEGORIES: AssetCategory[] = [
 		folder: 'assets/BG/',
 		description:
 			'对话动作 BG 使用的图片。文件路径示例：assets/BG/forest.png',
+	},
+	{
+		key: 'audio',
+		label: '音频',
+		folder: 'assets/Audio/',
+		kind: 'audio',
+		accept: '.wav,audio/wav,audio/x-wav,audio/wave',
+		description:
+			'对话动作 Sound 使用的音频。目前 MOD 仅支持 .wav。文件路径示例：assets/Audio/baka.wav',
 	},
 ];
 
@@ -141,8 +154,20 @@ const AssetFolderPanel = memo<AssetFolderPanelProps>(function AssetFolderPanel({
 			const normalized = targetFolder.endsWith('/')
 				? targetFolder
 				: `${targetFolder}/`;
+			const kind = category.kind ?? 'image';
 			for (const file of Array.from(files)) {
-				if (!file.type.startsWith('image/')) {
+				if (kind === 'audio') {
+					const lower = file.name.toLowerCase();
+					const isWav =
+						lower.endsWith('.wav') ||
+						file.type === 'audio/wav' ||
+						file.type === 'audio/x-wav' ||
+						file.type === 'audio/wave';
+					if (!isWav) {
+						alert(`已跳过非 .wav 音频文件: ${file.name}`);
+						continue;
+					}
+				} else if (!file.type.startsWith('image/')) {
 					alert(`已跳过非图片文件: ${file.name}`);
 					continue;
 				}
@@ -160,7 +185,7 @@ const AssetFolderPanel = memo<AssetFolderPanelProps>(function AssetFolderPanel({
 				updateAsset(path, blob);
 			}
 		},
-		[assetUrls, updateAsset]
+		[assetUrls, updateAsset, category.kind]
 	);
 
 	const handleFixedUpload = useCallback(
@@ -263,13 +288,20 @@ const AssetFolderPanel = memo<AssetFolderPanelProps>(function AssetFolderPanel({
 								onClick={() => fileInputRef.current?.click()}
 								className="btn-mystia-primary px-3 py-1 text-sm"
 							>
-								上传图片
+								{category.kind === 'audio'
+									? '上传音频'
+									: '上传图片'}
 							</button>
 						)}
 						<input
 							ref={fileInputRef}
 							type="file"
-							accept="image/*"
+							accept={
+								category.accept ??
+								(category.kind === 'audio'
+									? '.wav,audio/wav'
+									: 'image/*')
+							}
 							multiple
 							className="hidden"
 							onChange={(e) => {
@@ -309,6 +341,7 @@ const AssetFolderPanel = memo<AssetFolderPanelProps>(function AssetFolderPanel({
 							path={path}
 							url={assetUrls[path]!}
 							folder={isFree ? '' : category.folder!}
+							kind={category.kind ?? 'image'}
 							onRemove={() => handleRemove(path)}
 						/>
 					))}
@@ -375,6 +408,7 @@ interface AssetCardProps {
 	path: string;
 	url: string;
 	folder: string;
+	kind?: 'image' | 'audio';
 	onRemove: () => void;
 }
 
@@ -382,6 +416,7 @@ const AssetCard = memo<AssetCardProps>(function AssetCard({
 	path,
 	url,
 	folder,
+	kind = 'image',
 	onRemove,
 }) {
 	const filename = path.slice(folder.length);
@@ -392,13 +427,22 @@ const AssetCard = memo<AssetCardProps>(function AssetCard({
 
 	return (
 		<div className="group flex flex-col overflow-hidden rounded-lg border border-black/10 bg-white/40 dark:border-white/10 dark:bg-black/10">
-			<div className="bg-checkerboard flex h-28 items-center justify-center overflow-hidden">
-				<img
-					src={url}
-					alt={filename}
-					className="h-full w-full object-contain"
-					draggable={false}
-				/>
+			<div className="bg-checkerboard flex h-28 items-center justify-center overflow-hidden p-2">
+				{kind === 'audio' ? (
+					<audio
+						controls
+						src={url}
+						preload="none"
+						className="h-10 w-full"
+					/>
+				) : (
+					<img
+						src={url}
+						alt={filename}
+						className="h-full w-full object-contain"
+						draggable={false}
+					/>
+				)}
 			</div>
 			<div className="flex flex-col gap-1 p-2">
 				<span className="truncate text-xs font-medium" title={filename}>
