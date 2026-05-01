@@ -1,29 +1,46 @@
+/* eslint-disable sort-keys */
+
 import { type Config } from 'tailwindcss';
+import { heroui } from '@heroui/theme';
+
+import {
+	fontFamily,
+	getExtendConfig,
+	semanticColors,
+} from './src/design/theme';
+
+const herouiComponents = [
+	'avatar',
+	'badge',
+	'button',
+	'card',
+	'dropdown',
+	'link',
+	'modal',
+	'pagination',
+	'popover',
+	'scroll-shadow',
+	'snippet',
+	'switch',
+	'tooltip',
+	'toggle',
+];
 
 const config: Config = {
 	content: [
-		'./app/**/*.{js,ts,jsx,tsx,mdx}',
-		'./components/**/*.{js,ts,jsx,tsx,mdx}',
+		'./src/**/*.{ts,tsx}',
+		`./node_modules/@heroui/theme/dist/components/(${herouiComponents.join('|')}).js`,
 	],
-	darkMode: 'media',
-	theme: {
-		extend: {
-			backgroundImage: {
-				logo: 'url(/assets/icon.png)',
-				mystia: 'url(/assets/mystia.png)',
+	darkMode: 'selector',
+	theme: { extend: getExtendConfig(''), fontFamily },
+	plugins: [
+		heroui({
+			themes: {
+				'izakaya-dark': { extend: 'dark', colors: semanticColors.dark },
+				izakaya: { extend: 'light', colors: semanticColors.light },
 			},
-			colors: {
-				background: 'var(--background)',
-				foreground: 'var(--foreground)',
-				primary: { DEFAULT: '#5c9fba', foreground: '#ffffff' },
-				secondary: { DEFAULT: '#b67596', foreground: '#ffffff' },
-				success: { DEFAULT: '#85b26c', foreground: '#ffffff' },
-				danger: { DEFAULT: '#ec9aa1', foreground: '#ffffff' },
-			},
-			screens: { '3xl': '1920px', '4xl': '2560px' },
-		},
-	},
-	plugins: [],
+		}),
+	],
 };
 
 export default config;
