@@ -81,7 +81,7 @@ export default function AssetPage() {
 		<div className="flex flex-col">
 			<div className="container mx-auto w-full max-w-7xl px-6 py-8 3xl:max-w-screen-2xl 4xl:max-w-screen-3xl">
 				<div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
-					<aside className="flex h-min flex-col gap-2 rounded-lg bg-white/10 p-4 shadow-md backdrop-blur lg:sticky lg:top-24">
+					<aside className="flex h-min flex-col gap-2 rounded-lg bg-white/10 p-4 shadow-md backdrop-blur lg:sticky lg:top-24 lg:max-h-[calc(100dvh-7rem)]">
 						<h2 className="mb-2 text-xl font-semibold">资产分类</h2>
 						{CATEGORIES.map((cat) => (
 							<button

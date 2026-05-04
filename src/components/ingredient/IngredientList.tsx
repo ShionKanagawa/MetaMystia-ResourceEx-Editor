@@ -31,7 +31,7 @@ export const IngredientList = memo<IngredientListProps>(
 		);
 
 		return (
-			<div className="flex h-min flex-col gap-4 overflow-y-auto rounded-lg bg-white/10 p-4 shadow-md backdrop-blur lg:sticky lg:top-24">
+			<div className="flex h-min flex-col gap-4 overflow-y-auto rounded-lg bg-white/10 p-4 shadow-md backdrop-blur lg:sticky lg:top-24 lg:max-h-[calc(100dvh-7rem)]">
 				<div className="flex items-center justify-between">
 					<h2 className="text-xl font-semibold">原料列表</h2>
 					<Button

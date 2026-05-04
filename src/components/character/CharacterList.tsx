@@ -30,7 +30,7 @@ export const CharacterList = memo<CharacterListProps>(function CharacterList({
 	const packLabelPrefix = usePackLabelPrefix();
 
 	return (
-		<div className="flex h-min flex-col gap-4 overflow-y-auto rounded-lg bg-white/10 p-4 shadow-md backdrop-blur lg:sticky lg:top-24">
+		<div className="flex h-min flex-col gap-4 overflow-y-auto rounded-lg bg-white/10 p-4 shadow-md backdrop-blur lg:sticky lg:top-24 lg:max-h-[calc(100dvh-7rem)]">
 			<div className="flex items-center justify-between">
 				<h2 className="text-xl font-semibold">角色列表</h2>
 				<Button
