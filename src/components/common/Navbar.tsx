@@ -47,6 +47,7 @@ const NavDropdown = memo(function NavDropdown({
 				{items.map((item) => (
 					<DropdownItem
 						key={item.href}
+						as={Link}
 						href={item.href}
 						className={pathname === item.href ? 'text-primary' : ''}
 						textValue={item.label}
