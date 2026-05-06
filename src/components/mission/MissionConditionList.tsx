@@ -6,6 +6,7 @@ import { EditorField } from '@/components/common/EditorField';
 import { EmptyState } from '@/components/common/EmptyState';
 import { SectionAddButton } from '@/components/common/SectionAddButton';
 import { WarningNotice } from '@/components/common/WarningNotice';
+import { TagsField } from '@/components/common/TagsField';
 import { BEVERAGE_TAGS, FOOD_TAGS } from '@/data/tags';
 import type {
 	ConditionType,
@@ -332,14 +333,6 @@ function SubmitByTagEditor({ condition, onUpdate }: ConditionEditorProps) {
 function SubmitByTagsEditor({ condition, onUpdate }: ConditionEditorProps) {
 	const sellableType = condition.sellableType || 'Food';
 	const tagPool = sellableType === 'Food' ? FOOD_TAGS : BEVERAGE_TAGS;
-	const tags = condition.tags ?? [];
-
-	const toggleTag = (id: number, checked: boolean) => {
-		const next = checked
-			? Array.from(new Set([...tags, id])).sort((a, b) => a - b)
-			: tags.filter((t) => t !== id);
-		onUpdate({ tags: next });
-	};
 
 	return (
 		<div className="flex flex-col gap-3">
@@ -357,35 +350,12 @@ function SubmitByTagsEditor({ condition, onUpdate }: ConditionEditorProps) {
 					})
 				}
 			/>
-			<Field label={`Tags (已选 ${tags.length})`}>
-				<div className="flex max-h-48 flex-wrap gap-2 overflow-y-auto rounded border border-black/10 bg-white/50 p-2 dark:border-white/10 dark:bg-black/50">
-					{tagPool.map((t) => {
-						const checked = tags.includes(t.id);
-						return (
-							<label
-								key={t.id}
-								className={`flex cursor-pointer items-center gap-1 rounded px-2 py-1 text-xs transition ${
-									checked
-										? 'bg-primary/20 text-primary'
-										: 'bg-black/5 hover:bg-black/10 dark:bg-white/5 dark:hover:bg-white/10'
-								}`}
-							>
-								<input
-									type="checkbox"
-									className="h-3 w-3"
-									checked={checked}
-									onChange={(e) =>
-										toggleTag(t.id, e.target.checked)
-									}
-								/>
-								<span>
-									[{t.id}] {t.name}
-								</span>
-							</label>
-						);
-					})}
-				</div>
-			</Field>
+			<TagsField
+				label={`Tags (已选 ${(condition.tags ?? []).length})`}
+				tags={condition.tags ?? []}
+				tagPool={tagPool}
+				onChange={(newTags) => onUpdate({ tags: newTags })}
+			/>
 			<NumberField
 				label="Amount"
 				value={condition.amount}

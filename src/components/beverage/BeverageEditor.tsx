@@ -4,6 +4,7 @@ import { useData } from '@/components/context/DataContext';
 import { ErrorBadge } from '@/components/common/ErrorBadge';
 import { IdRangeBadge } from '@/components/common/IdRangeBadge';
 import { SpriteUploader } from '@/components/common/SpriteUploader';
+import { TagsField } from '@/components/common/TagsField';
 import { Label } from '@/components/common/Label';
 import { BEVERAGE_TAGS } from '@/data/tags';
 
@@ -34,27 +35,6 @@ export const BeverageEditor = memo<BeverageEditorProps>(
 				updateAsset(beverage.spritePath, blob);
 			},
 			[beverage, updateAsset]
-		);
-
-		const toggleTag = useCallback(
-			(tagId: number) => {
-				if (!beverage) return;
-
-				const currentTags = beverage.tags || [];
-				const exists = currentTags.includes(tagId);
-
-				let newTags;
-				if (exists) {
-					newTags = currentTags.filter((id) => id !== tagId);
-				} else {
-					newTags = [...currentTags, tagId];
-				}
-
-				newTags.sort((a, b) => a - b);
-
-				onUpdate({ tags: newTags });
-			},
-			[beverage, onUpdate]
 		);
 
 		if (!beverage) {
@@ -198,35 +178,12 @@ export const BeverageEditor = memo<BeverageEditorProps>(
 					<h3 className="text-sm font-bold uppercase tracking-wider opacity-60">
 						标签 (Beverage Tags)
 					</h3>
-					<div className="flex flex-wrap gap-2 rounded-xl border border-black/10 bg-white/40 p-4 dark:border-white/10 dark:bg-black/10">
-						{BEVERAGE_TAGS.map((tag) => {
-							const isSelected = beverage.tags?.includes(tag.id);
-							return (
-								<button
-									key={tag.id}
-									onClick={() => toggleTag(tag.id)}
-									className={cn(
-										'flex items-center border px-2 py-1 text-xs font-bold transition-all',
-										isSelected
-											? 'border-[#9d5437] bg-[#e6b4a6] text-[#830000] shadow-sm'
-											: 'border-black/20 bg-black/5 hover:bg-black/10 dark:border-white/20 dark:bg-white/5 dark:hover:bg-white/10'
-									)}
-								>
-									<span
-										className={cn(
-											'mr-1 transition-opacity',
-											isSelected
-												? 'opacity-100'
-												: 'opacity-40'
-										)}
-									>
-										⦁
-									</span>
-									{tag.name}
-								</button>
-							);
-						})}
-					</div>
+					<TagsField
+						label=""
+						tags={beverage.tags}
+						tagPool={BEVERAGE_TAGS}
+						onChange={(newTags) => onUpdate({ tags: newTags })}
+					/>
 				</div>
 
 				{/* 贴图 */}
