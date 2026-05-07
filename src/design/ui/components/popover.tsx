@@ -4,7 +4,12 @@ import { type ComponentProps, memo } from 'react';
 
 import { useMotionProps, useReducedMotion } from '@/design/ui/hooks';
 
-import { Popover as HeroUIPopover } from '@heroui/popover';
+import {
+	Popover as HeroUIPopover,
+	PopoverContent,
+	PopoverTrigger,
+	usePopoverContext,
+} from '@heroui/popover';
 import {
 	type InternalForwardRefRenderFunction,
 	extendVariants,
@@ -58,9 +63,5 @@ export default memo<IProps>(function Popover({
 
 export type { IProps as IPopoverProps };
 
-export {
-	PopoverContent,
-	PopoverTrigger,
-	usePopoverContext,
-} from '@heroui/popover';
+export { PopoverContent, PopoverTrigger, usePopoverContext };
 export type { PopoverContentProps, PopoverTriggerProps } from '@heroui/popover';

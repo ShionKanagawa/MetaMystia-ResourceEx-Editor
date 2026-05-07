@@ -5,8 +5,11 @@ import { type JSX, memo } from 'react';
 import { useMotionProps, useReducedMotion } from '@/design/ui/hooks';
 
 import {
+	DropdownItem,
+	DropdownMenu,
 	type DropdownProps,
 	Dropdown as HeroUIDropdown,
+	DropdownTrigger,
 } from '@heroui/dropdown';
 
 import { cn } from '@/design/ui/utils';
@@ -42,7 +45,7 @@ export default memo<IProps>(function Dropdown({
 
 export type { IProps as IDropdownProps };
 
-export { DropdownItem, DropdownMenu, DropdownTrigger } from '@heroui/dropdown';
+export { DropdownItem, DropdownMenu, DropdownTrigger };
 export type {
 	DropdownItemProps,
 	DropdownMenuProps,
