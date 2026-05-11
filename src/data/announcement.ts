@@ -1,4 +1,4 @@
-export const ANNOUNCEMENT_VERSION = 'v0.9.2-2026-05-07';
+export const ANNOUNCEMENT_VERSION = 'v0.9.2-2026-05-11';
 
 export const ANNOUNCEMENT_TITLE =
 	'MetaMystia ResourceEx Editor 公告 / Announcements';
@@ -23,6 +23,7 @@ export const ANNOUNCEMENT_SECTIONS: AnnouncementSection[] = [
 	{
 		title: '近期更新 / Recent Updates',
 		items: [
+			'许可证不再写入 ResourceEx.json，仅保存在压缩包内的 LICENSE.md 中；编辑器会忽略 packInfo.license 字段。 / The license is no longer written into ResourceEx.json and is stored only in LICENSE.md inside the zip; the editor ignores the legacy packInfo.license field.',
 			'新增顶部公告按钮，可从 GitHub 按钮旁随时重新打开公告。 / Added a top-bar announcement button next to GitHub so announcements can be reopened at any time.',
 			'修复设计系统运行时导出问题，稳定 cn、Dropdown、Popover 在生产构建中的行为。 / Fixed runtime exports in the design UI layer so cn, Dropdown, and Popover work reliably in production builds.',
 			'将多个原生下拉框替换为统一 Select 组件，改善深色主题下的选择体验。 / Replaced several native select controls with the unified Select component for a better themed dropdown experience.',

@@ -25,6 +25,9 @@ interface DataContextType {
 	data: ResourceEx;
 	setData: (data: ResourceEx) => void;
 
+	license: string;
+	setLicense: (value: string) => void;
+
 	// Asset management
 	assetUrls: Record<string, string>;
 	updateAsset: (path: string, blob: Blob) => void;
@@ -62,7 +65,13 @@ export function DataProvider({ children }: PropsWithChildren) {
 		merchants: [],
 		clothes: [],
 	});
+	const [license, setLicenseState] = useState('');
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+	const setLicense = useCallback((value: string) => {
+		setLicenseState(value);
+		setHasUnsavedChanges(true);
+	}, []);
 
 	// Store blobs in a Ref to avoid re-renders on every small change
 	const assetsRef = useRef<Map<string, Blob>>(new Map());
@@ -263,10 +272,8 @@ export function DataProvider({ children }: PropsWithChildren) {
 					description: (jsonData as any).description,
 					version: (jsonData as any).version,
 				};
-				// Override license with LICENSE.md content if exists
-				if (licenseContent) {
-					packInfo.license = licenseContent;
-				}
+				setLicenseState(licenseContent);
+				delete (packInfo as { license?: string }).license;
 				setData({
 					packInfo,
 					characters: jsonData.characters || [],
@@ -478,14 +485,21 @@ export function DataProvider({ children }: PropsWithChildren) {
 			// Trim strings and replace CRLF with LF
 			trimCRLF(exportData);
 
+			// License is stored exclusively in LICENSE.md, never in
+			// ResourceEx.json. Defensively strip any stray license field
+			// that might still be present from legacy data.
+			if (exportData.packInfo) {
+				delete (exportData.packInfo as { license?: string }).license;
+			}
+
 			zip.file(
 				'ResourceEx.json',
 				`${JSON.stringify(exportData, null, 2)}\n`
 			);
 
 			// Add LICENSE.md if license exists
-			if (data.packInfo?.license) {
-				zip.file('LICENSE.md', data.packInfo.license);
+			if (license) {
+				zip.file('LICENSE.md', license);
 			}
 
 			// Collect all used asset paths
@@ -573,7 +587,7 @@ export function DataProvider({ children }: PropsWithChildren) {
 			saveAs(content, finalName);
 			setHasUnsavedChanges(false);
 		},
-		[data]
+		[data, license]
 	);
 
 	const createBlank = useCallback(() => {
@@ -607,6 +621,7 @@ export function DataProvider({ children }: PropsWithChildren) {
 		Object.values(assetUrls).forEach((url) => revokeUrl(url));
 		assetsRef.current = new Map();
 		setAssetUrls({});
+		setLicenseState('');
 		setHasUnsavedChanges(false);
 	}, [hasUnsavedChanges, assetUrls, revokeUrl]);
 
@@ -615,6 +630,8 @@ export function DataProvider({ children }: PropsWithChildren) {
 			value={{
 				data,
 				setData,
+				license,
+				setLicense,
 				assetUrls,
 				updateAsset,
 				removeAsset,

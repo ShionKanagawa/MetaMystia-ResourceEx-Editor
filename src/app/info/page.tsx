@@ -17,7 +17,8 @@ import {
 } from '@/lib/constants';
 
 export default function InfoPage() {
-	const { data, setData, setHasUnsavedChanges } = useData();
+	const { data, setData, setHasUnsavedChanges, license, setLicense } =
+		useData();
 	const packInfo = data.packInfo || {};
 	const isVersionValid = useVersionValidation(packInfo.version);
 	const labelValue = packInfo.label || '';
@@ -162,11 +163,9 @@ export default function InfoPage() {
 					{/* License */}
 					<EditorField label="许可证 (License)">
 						<TextArea
-							value={packInfo.license || ''}
-							onChange={(e) =>
-								updatePackInfo({ license: e.target.value })
-							}
-							placeholder="在此处粘贴许可证文本..."
+							value={license}
+							onChange={(e) => setLicense(e.target.value)}
+							placeholder="在此处粘贴许可证文本，将单独保存为 LICENSE.md..."
 							autoResize
 						/>
 					</EditorField>

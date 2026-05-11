@@ -400,7 +400,6 @@ export interface PackInfo {
 	dependencies?: string[];
 	description?: string;
 	version?: string;
-	license?: string;
 	idRangeStart?: number | undefined;
 	idRangeEnd?: number | undefined;
 	idSignature?: string | undefined;
