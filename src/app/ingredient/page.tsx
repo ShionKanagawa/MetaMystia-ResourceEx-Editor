@@ -20,7 +20,7 @@ export default function IngredientPage() {
 			name: `新原料${data.ingredients.length + 1}`,
 			description: '',
 			level: 1,
-			prefix: 0,
+			prefix: -1,
 			isFish: false,
 			isMeat: false,
 			isVeg: false,

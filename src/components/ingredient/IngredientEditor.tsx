@@ -1,13 +1,19 @@
-import { memo, useCallback, useId } from 'react';
+import { memo, useCallback, useId, useMemo } from 'react';
 
 import { useData } from '@/components/context/DataContext';
 import { ErrorBadge } from '@/components/common/ErrorBadge';
 import { IdRangeBadge } from '@/components/common/IdRangeBadge';
+import { InfoTip } from '@/components/common/InfoTip';
 import { SpriteUploader } from '@/components/common/SpriteUploader';
 import { TagsField } from '@/components/common/TagsField';
 import { Label } from '@/components/common/Label';
 import { FOOD_TAGS } from '@/data/tags';
+import {
+	INGREDIENT_PREFIXES,
+	INGREDIENT_PREFIX_NONE_ID,
+} from '@/data/ingredientPrefixes';
 
+import { Select } from '@/design/ui/components';
 import { cn } from '@/design/ui/utils';
 import type { Ingredient } from '@/types/resource';
 
@@ -38,6 +44,15 @@ export const IngredientEditor = memo<IngredientEditorProps>(
 			[ingredient, updateAsset]
 		);
 
+		const prefixItems = useMemo(
+			() =>
+				INGREDIENT_PREFIXES.map((p) => ({
+					value: p.id,
+					label: `[${p.id}] ${p.label}`,
+				})),
+			[]
+		);
+
 		if (!ingredient) {
 			return (
 				<div className="col-span-2 flex h-96 items-center justify-center rounded-lg bg-white/10 p-4 shadow-md backdrop-blur">
@@ -49,6 +64,12 @@ export const IngredientEditor = memo<IngredientEditorProps>(
 		}
 
 		const spriteUrl = getAssetUrl(ingredient.spritePath);
+
+		const prefixValue = INGREDIENT_PREFIXES.some(
+			(p) => p.id === ingredient.prefix
+		)
+			? ingredient.prefix
+			: INGREDIENT_PREFIX_NONE_ID;
 
 		return (
 			<div className="col-span-2 flex flex-col gap-6 overflow-y-auto rounded-lg bg-white/10 p-6 shadow-md backdrop-blur">
@@ -154,21 +175,39 @@ export const IngredientEditor = memo<IngredientEditorProps>(
 						</div>
 
 						<div className="flex flex-col gap-1">
-							<Label htmlFor={idPrefix}>前缀 (Prefix)</Label>
-							<input
+							<div className="flex items-center gap-1">
+								<Label htmlFor={idPrefix}>前缀 (Prefix)</Label>
+								<InfoTip>
+									<div className="max-w-xs space-y-1 text-xs leading-relaxed">
+										<p>
+											此字段为
+											<span className="font-semibold">
+												游戏废案
+											</span>
+											，原版游戏未启用前缀效果。
+										</p>
+										<p>
+											若要在游戏中实际生效，请安装模组{' '}
+											<a
+												href="https://github.com/MetaMystia/PreFix"
+												target="_blank"
+												rel="noreferrer"
+												className="underline"
+											>
+												MetaMystia/PreFix
+											</a>
+											。
+										</p>
+										<p>默认值为「[-1] 无」。</p>
+									</div>
+								</InfoTip>
+							</div>
+							<Select<number>
 								id={idPrefix}
-								type="number"
-								value={
-									isNaN(ingredient.prefix)
-										? ''
-										: ingredient.prefix
-								}
-								onChange={(e) =>
-									onUpdate({
-										prefix: parseInt(e.target.value),
-									})
-								}
-								className="h-9 w-full rounded-lg border border-black/10 bg-white/40 px-3 py-2 text-sm text-foreground outline-none transition-all focus:border-black/30 focus:ring-2 focus:ring-black/10 dark:border-white/10 dark:bg-black/10 dark:focus:border-white/10 dark:focus:ring-white/10"
+								ariaLabel="原料前缀"
+								value={prefixValue}
+								onChange={(v) => onUpdate({ prefix: v })}
+								items={prefixItems}
 							/>
 						</div>
 

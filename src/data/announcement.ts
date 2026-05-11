@@ -1,4 +1,4 @@
-export const ANNOUNCEMENT_VERSION = 'v0.9.4-2026-05-11';
+export const ANNOUNCEMENT_VERSION = 'v0.9.5-2026-05-11';
 
 export const ANNOUNCEMENT_TITLE = 'MetaMystia ResourceEx Editor 公告';
 
@@ -19,6 +19,7 @@ export const ANNOUNCEMENT_SECTIONS: AnnouncementSection[] = [
 	{
 		title: '近期更新',
 		items: [
+			'允许设置原料前缀(Prefix)废案，如需启用，请安装 https://github.com/MetaMystia/PreFix 模组',
 			'修复资产页面音频分类的空状态文案，现已与「上传音频」按钮保持一致。',
 			'许可证不再写入 ResourceEx.json，仅保存在压缩包内的 LICENSE.md 中；编辑器会忽略 packInfo.license 字段。',
 			'新增顶部公告按钮，可从 GitHub 按钮旁随时重新打开公告。',
