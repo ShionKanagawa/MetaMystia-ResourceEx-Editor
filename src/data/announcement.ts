@@ -23,6 +23,7 @@ export const ANNOUNCEMENT_SECTIONS: AnnouncementSection[] = [
 	{
 		title: '近期更新 / Recent Updates',
 		items: [
+			'修复资产页面音频分类的空状态文案，现已与「上传音频」按钮保持一致。 / Fixed the empty-state copy on the asset page so audio categories now match the "Upload Audio" button label.',
 			'许可证不再写入 ResourceEx.json，仅保存在压缩包内的 LICENSE.md 中；编辑器会忽略 packInfo.license 字段。 / The license is no longer written into ResourceEx.json and is stored only in LICENSE.md inside the zip; the editor ignores the legacy packInfo.license field.',
 			'新增顶部公告按钮，可从 GitHub 按钮旁随时重新打开公告。 / Added a top-bar announcement button next to GitHub so announcements can be reopened at any time.',
 			'修复设计系统运行时导出问题，稳定 cn、Dropdown、Popover 在生产构建中的行为。 / Fixed runtime exports in the design UI layer so cn, Dropdown, and Popover work reliably in production builds.',

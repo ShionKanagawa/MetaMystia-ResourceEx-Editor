@@ -330,7 +330,9 @@ const AssetFolderPanel = memo<AssetFolderPanelProps>(function AssetFolderPanel({
 					description={
 						isFree
 							? '上方输入目标目录后点击上传，或在该目录下放置文件后重新导入资源包。'
-							: '点击「上传图片」添加，或在此目录下放置文件后重新导入资源包。'
+							: category.kind === 'audio'
+								? '点击「上传音频」添加，或在此目录下放置文件后重新导入资源包。'
+								: '点击「上传图片」添加，或在此目录下放置文件后重新导入资源包。'
 					}
 				/>
 			) : (
