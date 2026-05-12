@@ -18,6 +18,22 @@ export {
 } from './fadeMotionDiv';
 export { default as Link, type ILinkProps } from './link';
 export { default as Modal, type IModalProps } from './modal';
+export {
+	default as Navbar,
+	type INavbarProps,
+	NavbarBrand,
+	type NavbarBrandProps,
+	NavbarContent,
+	type NavbarContentProps,
+	NavbarItem,
+	type NavbarItemProps,
+	NavbarMenu,
+	type NavbarMenuProps,
+	NavbarMenuItem,
+	type NavbarMenuItemProps,
+	NavbarMenuToggle,
+	type NavbarMenuToggleProps,
+} from './navbar';
 export { default as Pagination, type IPaginationProps } from './pagination';
 export {
 	default as Popover,
