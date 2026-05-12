@@ -17,6 +17,7 @@ const herouiComponents = [
 	'dropdown',
 	'link',
 	'modal',
+	'navbar',
 	'pagination',
 	'popover',
 	'scroll-shadow',
