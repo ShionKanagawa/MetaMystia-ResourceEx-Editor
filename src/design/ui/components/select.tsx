@@ -56,7 +56,7 @@ export interface ISelectProps<V extends SelectValue = SelectValue> {
 	isInvalid?: boolean;
 	isDisabled?: boolean;
 	id?: string;
-	/** 弹出菜单的最大高度（Tailwind 类，默认 max-h-80）。 */
+	/** 弹出菜单的最大高度（Tailwind 类，默认 max-h-60，约 7 项）。 */
 	menuMaxHeightClass?: string;
 }
 
@@ -113,7 +113,7 @@ export function Select<V extends SelectValue = SelectValue>({
 	isInvalid,
 	isDisabled,
 	id,
-	menuMaxHeightClass = 'max-h-80',
+	menuMaxHeightClass = 'max-h-60',
 }: ISelectProps<V>) {
 	const fallbackId = useId();
 	const buttonId = id ?? fallbackId;
