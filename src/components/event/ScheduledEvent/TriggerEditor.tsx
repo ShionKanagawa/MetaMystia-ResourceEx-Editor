@@ -18,7 +18,7 @@ export const TRIGGER_TYPES = [
 	{ value: 'OnWorkEnd', label: '【未实现】工作结束前(OnWorkEnd)' },
 	{
 		value: 'OnTalkWithCharacter',
-		label: '【未实现】和角色对话时(OnTalkWithCharacter)',
+		label: '和角色对话时(OnTalkWithCharacter)',
 	},
 	{
 		value: 'OnBeforeWorkStart',
@@ -134,7 +134,8 @@ export const TriggerEditor = memo<TriggerEditorProps>(function TriggerEditor({
 							triggerId?: string;
 						} = { triggerType: newType };
 						if (
-							newType === 'KizunaCheckPoint' &&
+							(newType === 'KizunaCheckPoint' ||
+								newType === 'OnTalkWithCharacter') &&
 							trigger?.triggerId
 						) {
 							newTrigger.triggerId = trigger.triggerId;
@@ -148,7 +149,8 @@ export const TriggerEditor = memo<TriggerEditorProps>(function TriggerEditor({
 				/>
 			</div>
 
-			{trigger?.triggerType === 'KizunaCheckPoint' && (
+			{(trigger?.triggerType === 'KizunaCheckPoint' ||
+				trigger?.triggerType === 'OnTalkWithCharacter') && (
 				<div className="flex flex-col gap-1">
 					<label className="text-xs font-medium opacity-70">
 						Target Character (Trigger ID)
@@ -174,7 +176,8 @@ export const TriggerEditor = memo<TriggerEditorProps>(function TriggerEditor({
 			)}
 
 			{trigger?.triggerType &&
-				trigger.triggerType !== 'KizunaCheckPoint' && (
+				trigger.triggerType !== 'KizunaCheckPoint' &&
+				trigger.triggerType !== 'OnTalkWithCharacter' && (
 					<WarningNotice>
 						⚠ 当前编辑器尚未支持配置此条件的详细参数
 					</WarningNotice>
