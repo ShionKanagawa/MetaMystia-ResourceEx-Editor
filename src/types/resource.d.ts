@@ -98,6 +98,9 @@ export interface Character {
 	guest?: GuestInfo | undefined;
 	kizuna?: KizunaInfo | undefined;
 	characterSpriteSetCompact?: CharacterSpriteSet | undefined;
+	hideInAlbum?: boolean;
+	isParticular?: boolean;
+	isCollabCharacter?: boolean;
 }
 
 export type DialogActionType = 'CameraShake' | 'CG' | 'BG' | 'Sound';

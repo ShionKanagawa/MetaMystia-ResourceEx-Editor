@@ -183,6 +183,9 @@ export function DataProvider({ children }: PropsWithChildren) {
 				if (jsonData.characters) {
 					jsonData.characters = jsonData.characters.map((char) => ({
 						...char,
+						hideInAlbum: char.hideInAlbum ?? false,
+						isParticular: char.isParticular ?? false,
+						isCollabCharacter: char.isCollabCharacter ?? false,
 						descriptions: char.descriptions
 							? [...char.descriptions, '', '', ''].slice(0, 3)
 							: ['', '', ''],

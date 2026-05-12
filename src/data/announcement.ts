@@ -1,4 +1,4 @@
-export const ANNOUNCEMENT_VERSION = 'v0.9.6-2026-05-12';
+export const ANNOUNCEMENT_VERSION = 'v0.9.7-2026-05-12';
 
 export const ANNOUNCEMENT_TITLE = 'MetaMystia ResourceEx Editor 公告';
 
@@ -19,6 +19,7 @@ export const ANNOUNCEMENT_SECTIONS: AnnouncementSection[] = [
 	{
 		title: '近期更新',
 		items: [
+			'允许为自定义稀客增加 hideInAlbum isParticular isCollabCharacter 配置项',
 			'允许在 Event 中设计「和角色对话时(OnTalkWithCharacter)」类型的条件触发器',
 			'允许设置原料前缀(Prefix)废案，如需启用，请安装 https://github.com/MetaMystia/PreFix 模组',
 			'修复资产页面音频分类的空状态文案，现已与「上传音频」按钮保持一致。',

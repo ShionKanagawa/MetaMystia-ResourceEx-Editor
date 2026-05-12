@@ -1,6 +1,7 @@
 import { memo, useCallback, useEffect } from 'react';
 
 import { SectionDeleteButton } from '@/components/common/SectionDeleteButton';
+import { Switch } from '@/design/ui/components';
 import { BasicInfo } from './editor/BasicInfo';
 import { Descriptions } from './editor/Descriptions';
 import { SpawnMarkerEditor } from './editor/SpawnMarker';
@@ -379,6 +380,41 @@ export const CharacterEditor = memo<CharacterEditorProps>(
 					}
 					onUpdate={updateSpawnMarker}
 				/>
+
+				<div className="flex items-center justify-between gap-4">
+					<div className="flex items-center gap-2">
+						<span className="whitespace-nowrap text-sm">
+							在图鉴中隐藏
+						</span>
+						<Switch
+							size="sm"
+							isSelected={character.hideInAlbum ?? false}
+							onValueChange={(v) => onUpdate({ hideInAlbum: v })}
+						/>
+					</div>
+					<div className="flex items-center gap-2">
+						<span className="whitespace-nowrap text-sm">
+							是特殊客人
+						</span>
+						<Switch
+							size="sm"
+							isSelected={character.isParticular ?? false}
+							onValueChange={(v) => onUpdate({ isParticular: v })}
+						/>
+					</div>
+					<div className="flex items-center gap-2">
+						<span className="whitespace-nowrap text-sm">
+							是联动客人
+						</span>
+						<Switch
+							size="sm"
+							isSelected={character.isCollabCharacter ?? false}
+							onValueChange={(v) =>
+								onUpdate({ isCollabCharacter: v })
+							}
+						/>
+					</div>
+				</div>
 
 				<Portraits
 					characterId={character.id}
