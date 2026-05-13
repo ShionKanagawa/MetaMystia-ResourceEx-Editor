@@ -66,12 +66,13 @@ export const PostEventList = memo<PostEventListProps>(function PostEventList({
 						key={index}
 						className="flex flex-col gap-3 rounded-lg border border-black/5 bg-black/5 p-4 dark:border-white/5 dark:bg-white/5"
 					>
-						<div className="flex items-center justify-between gap-4">
-							<div className="flex flex-1 flex-col gap-1">
-								<label className="text-xs font-medium opacity-70">
-									事件 Label
-								</label>
+						<div className="flex flex-col gap-1">
+							<label className="text-xs font-medium opacity-70">
+								事件 Label
+							</label>
+							<div className="flex items-center justify-between gap-4">
 								<Select<string>
+									className="flex-1"
 									value={pe}
 									onChange={(value) =>
 										updatePostEvent(index, value)
@@ -79,15 +80,15 @@ export const PostEventList = memo<PostEventListProps>(function PostEventList({
 									placeholder="请选择事件..."
 									items={eventItems}
 								/>
+								<Button
+									variant="light"
+									size="sm"
+									onPress={() => removePostEvent(index)}
+									className="text-xs text-danger hover:bg-danger/10"
+								>
+									删除
+								</Button>
 							</div>
-							<Button
-								variant="light"
-								size="sm"
-								onPress={() => removePostEvent(index)}
-								className="text-xs text-danger hover:bg-danger/10"
-							>
-								删除
-							</Button>
 						</div>
 					</div>
 				))}
