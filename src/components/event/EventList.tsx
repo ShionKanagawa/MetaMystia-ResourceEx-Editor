@@ -22,7 +22,7 @@ export const EventList = memo<EventListProps>(function EventList({
 	const packLabelPrefix = usePackLabelPrefix();
 
 	return (
-		<div className="flex h-min flex-col gap-4 overflow-y-auto rounded-lg bg-white/10 p-4 shadow-md backdrop-blur lg:sticky lg:top-24 lg:max-h-[calc(100dvh-7rem)]">
+		<div className="flex h-min min-w-0 flex-col gap-4 overflow-y-auto rounded-lg bg-white/10 p-4 shadow-md backdrop-blur lg:sticky lg:top-24 lg:max-h-[calc(100dvh-7rem)]">
 			<div className="flex items-center justify-between">
 				<h2 className="text-xl font-semibold">事件节点列表</h2>
 				<Button
@@ -47,21 +47,23 @@ export const EventList = memo<EventListProps>(function EventList({
 							key={index}
 							onClick={() => onSelect(index)}
 							className={cn(
-								'surface-pressable flex-col items-start border p-4',
+								'surface-pressable min-w-0 flex-col items-start gap-1.5 border p-4 text-left',
 								selectedIndex === index
 									? 'border-primary bg-primary/20 shadow-inner'
 									: 'border-transparent bg-black/5 hover:bg-black/10 dark:bg-white/5 dark:hover:bg-white/10'
 							)}
 						>
-							<div className="flex items-center gap-2">
-								<span className="text-lg font-bold text-foreground">
+							<div className="flex w-full min-w-0 items-start gap-2">
+								<span className="min-w-0 text-lg font-bold leading-snug text-foreground">
 									{event.debugLabel || '未命名事件'}
 								</span>
 								{hasPrefixWarning && (
-									<WarningBadge>前缀不规范</WarningBadge>
+									<WarningBadge className="mt-0.5 shrink-0">
+										前缀不规范
+									</WarningBadge>
 								)}
 							</div>
-							<div className="font-mono text-xs text-foreground opacity-80">
+							<div className="w-full min-w-0 break-all font-mono text-[11px] text-foreground/50">
 								{event.label}
 							</div>
 						</button>
