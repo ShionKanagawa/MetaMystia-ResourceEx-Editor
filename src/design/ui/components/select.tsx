@@ -149,7 +149,7 @@ export function Select<V extends SelectValue = SelectValue>({
 		size === 'sm' ? 'h-8 px-2 text-xs gap-1' : 'h-9 px-3 text-sm gap-2';
 
 	const defaultTriggerClass = cn(
-		'flex w-full items-center justify-between rounded-lg border bg-white/40 py-2 text-foreground outline-none transition-all dark:bg-black/10',
+		'flex w-full min-w-0 items-center justify-between rounded-lg border bg-white/40 py-2 text-foreground outline-none transition-all dark:bg-black/10',
 		'focus:border-black/30 focus:ring-2 focus:ring-black/10 dark:focus:border-white/30 dark:focus:ring-white/10',
 		'disabled:cursor-not-allowed disabled:opacity-50',
 		sizeClass,
@@ -211,8 +211,11 @@ export function Select<V extends SelectValue = SelectValue>({
 				className={cn(menuMaxHeightClass, 'overflow-y-auto')}
 				style={
 					menuMinWidth !== undefined
-						? { minWidth: menuMinWidth }
-						: undefined
+						? {
+								minWidth: menuMinWidth,
+								maxWidth: 'min(420px,90vw)',
+							}
+						: { maxWidth: 'min(420px,90vw)' }
 				}
 			>
 				{items.map((item, idx) => {
@@ -234,7 +237,9 @@ export function Select<V extends SelectValue = SelectValue>({
 										}
 										description={opt.description}
 									>
-										{opt.label}
+										<span className="break-all">
+											{opt.label}
+										</span>
 									</DropdownItem>
 								))}
 							</DropdownSection>
@@ -251,7 +256,7 @@ export function Select<V extends SelectValue = SelectValue>({
 							}
 							description={item.description}
 						>
-							{item.label}
+							<span className="break-all">{item.label}</span>
 						</DropdownItem>
 					);
 				})}
