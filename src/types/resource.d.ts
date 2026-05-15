@@ -422,3 +422,8 @@ export interface ResourceEx {
 	merchants?: MerchantConfig[];
 	clothes?: Clothes[];
 }
+
+export interface AssetPathOperation {
+	from: string;
+	to: string;
+}

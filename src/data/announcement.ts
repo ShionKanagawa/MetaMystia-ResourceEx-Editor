@@ -1,4 +1,4 @@
-export const ANNOUNCEMENT_VERSION = 'v0.9.11-2026-05-14';
+export const ANNOUNCEMENT_VERSION = 'v0.10.0-2026-05-15';
 
 export const ANNOUNCEMENT_TITLE = 'MetaMystia ResourceEx Editor 公告';
 
@@ -11,14 +11,9 @@ export interface AnnouncementSection {
 
 export const ANNOUNCEMENT_SECTIONS: AnnouncementSection[] = [
 	{
-		title: '重构通知',
-		items: [
-			'MetaMiku 最近全面重构了此编辑器，使用时请多导出，如果您发现有任何 bug，请及时反馈。',
-		],
-	},
-	{
 		title: '近期更新',
 		items: [
+			'重构资产浏览器，允许自由编辑资产',
 			'添加列表页折叠功能，支持角色、料理、酒水、原料、任务和事件等列表',
 			'修复任务节点、事件节点列表的文本溢出和居中对齐问题',
 			'统一修复 Select 下拉菜单过宽及删除按钮错位问题，优化长文本显示。',

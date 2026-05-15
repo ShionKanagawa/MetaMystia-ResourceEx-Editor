@@ -18,6 +18,7 @@ import {
 } from '@/lib/constants';
 
 import type { ResourceEx } from '@/types/resource';
+import type { AssetPathOperation } from '@/types/resource';
 import type { Dialog, DialogAction } from '@/types/resource';
 import { sortValues, trimCRLF } from './utils';
 
@@ -30,8 +31,13 @@ interface DataContextType {
 
 	// Asset management
 	assetUrls: Record<string, string>;
+	assetFolders: string[];
 	updateAsset: (path: string, blob: Blob) => void;
 	removeAsset: (path: string) => void;
+	createAssetFolder: (path: string) => void;
+	removeAssetFolders: (paths: string[]) => void;
+	moveAssets: (operations: AssetPathOperation[]) => void;
+	copyAssets: (operations: AssetPathOperation[]) => void;
 	getAssetUrl: (path: string) => string | undefined;
 
 	// File operations
@@ -77,6 +83,7 @@ export function DataProvider({ children }: PropsWithChildren) {
 	const assetsRef = useRef<Map<string, Blob>>(new Map());
 	// Store URLs in state for UI rendering
 	const [assetUrls, setAssetUrls] = useState<Record<string, string>>({});
+	const [assetFolders, setAssetFolders] = useState<string[]>(['assets/']);
 
 	// Track all URLs for cleanup
 	const allGeneratedUrls = useRef<Set<string>>(new Set());
@@ -141,6 +148,88 @@ export function DataProvider({ children }: PropsWithChildren) {
 			setHasUnsavedChanges(true);
 		},
 		[revokeUrl]
+	);
+
+	const createAssetFolder = useCallback((path: string) => {
+		const folder = path.endsWith('/') ? path : `${path}/`;
+		setAssetFolders((prev) =>
+			prev.includes(folder) ? prev : [...prev, folder].sort()
+		);
+		setHasUnsavedChanges(true);
+	}, []);
+
+	const removeAssetFolders = useCallback((paths: string[]) => {
+		const folders = paths.map((path) =>
+			path.endsWith('/') ? path : `${path}/`
+		);
+		if (folders.length === 0) return;
+		setAssetFolders((prev) =>
+			prev.filter(
+				(folder) =>
+					!folders.some(
+						(target) =>
+							folder === target || folder.startsWith(target)
+					)
+			)
+		);
+		setHasUnsavedChanges(true);
+	}, []);
+
+	const moveAssets = useCallback(
+		(operations: AssetPathOperation[]) => {
+			if (operations.length === 0) return;
+
+			const nextAssetUrls = { ...assetUrls };
+			const nextAssets = new Map(assetsRef.current);
+			let changed = false;
+
+			for (const { from, to } of operations) {
+				if (from === to || !nextAssets.has(from)) continue;
+				const blob = nextAssets.get(from);
+				const url = nextAssetUrls[from];
+				if (!blob || !url) continue;
+
+				if (nextAssetUrls[to]) revokeUrl(nextAssetUrls[to]);
+				nextAssets.delete(from);
+				delete nextAssetUrls[from];
+				nextAssets.set(to, blob);
+				nextAssetUrls[to] = url;
+				changed = true;
+			}
+
+			if (!changed) return;
+			assetsRef.current = nextAssets;
+			setAssetUrls(nextAssetUrls);
+			setHasUnsavedChanges(true);
+		},
+		[assetUrls, revokeUrl]
+	);
+
+	const copyAssets = useCallback(
+		(operations: AssetPathOperation[]) => {
+			if (operations.length === 0) return;
+
+			const nextAssetUrls = { ...assetUrls };
+			const nextAssets = new Map(assetsRef.current);
+			let changed = false;
+
+			for (const { from, to } of operations) {
+				if (from === to || !nextAssets.has(from)) continue;
+				const blob = nextAssets.get(from);
+				if (!blob) continue;
+
+				if (nextAssetUrls[to]) revokeUrl(nextAssetUrls[to]);
+				nextAssets.set(to, blob);
+				nextAssetUrls[to] = registerUrl(URL.createObjectURL(blob));
+				changed = true;
+			}
+
+			if (!changed) return;
+			assetsRef.current = nextAssets;
+			setAssetUrls(nextAssetUrls);
+			setHasUnsavedChanges(true);
+		},
+		[assetUrls, registerUrl, revokeUrl]
 	);
 
 	const getAssetUrl = useCallback(
@@ -247,26 +336,37 @@ export function DataProvider({ children }: PropsWithChildren) {
 				assetsRef.current = new Map();
 
 				const newAssetUrls: Record<string, string> = {};
+				const newAssetFolders = new Set<string>(['assets/']);
 
 				// Load new assets
 				const entries = Object.keys(zip.files)
 					.map((name) => zip.files[name])
 					.filter((entry) => entry !== undefined);
 				for (const entry of entries) {
-					if (
-						!entry.dir &&
-						entry.name !== 'ResourceEx.json' &&
-						!entry.name.startsWith('__MACOSX')
-					) {
+					if (entry.name.startsWith('__MACOSX')) continue;
+					if (entry.dir) {
+						if (entry.name.startsWith('assets/')) {
+							newAssetFolders.add(entry.name);
+						}
+					} else if (entry.name !== 'ResourceEx.json') {
 						const blob = await entry.async('blob');
 						assetsRef.current.set(entry.name, blob);
 						newAssetUrls[entry.name] = registerUrl(
 							URL.createObjectURL(blob)
 						);
+						if (entry.name.startsWith('assets/')) {
+							const parts = entry.name.split('/');
+							for (let i = 1; i < parts.length; i++) {
+								newAssetFolders.add(
+									`${parts.slice(0, i).join('/')}/`
+								);
+							}
+						}
 					}
 				}
 
 				setAssetUrls(newAssetUrls);
+				setAssetFolders(Array.from(newAssetFolders).sort());
 				// Migration for flat properties to packInfo
 				const packInfo = jsonData.packInfo || {
 					name: (jsonData as any).name,
@@ -571,9 +671,16 @@ export function DataProvider({ children }: PropsWithChildren) {
 				});
 			});
 
-			// Add only used assets
+			// Add managed assets. Validation still warns when JSON references
+			// missing files, but user-managed assets should round-trip even
+			// before they are referenced by a module.
+			assetFolders.forEach((folder) => {
+				if (folder.startsWith('assets/')) {
+					zip.folder(folder);
+				}
+			});
 			assetsRef.current.forEach((blob, path) => {
-				if (usedPaths.has(path)) {
+				if (usedPaths.has(path) || path.startsWith('assets/')) {
 					zip.file(path, blob);
 				}
 			});
@@ -590,7 +697,7 @@ export function DataProvider({ children }: PropsWithChildren) {
 			saveAs(content, finalName);
 			setHasUnsavedChanges(false);
 		},
-		[data, license]
+		[data, license, assetFolders]
 	);
 
 	const createBlank = useCallback(() => {
@@ -624,6 +731,7 @@ export function DataProvider({ children }: PropsWithChildren) {
 		Object.values(assetUrls).forEach((url) => revokeUrl(url));
 		assetsRef.current = new Map();
 		setAssetUrls({});
+		setAssetFolders(['assets/']);
 		setLicenseState('');
 		setHasUnsavedChanges(false);
 	}, [hasUnsavedChanges, assetUrls, revokeUrl]);
@@ -636,8 +744,13 @@ export function DataProvider({ children }: PropsWithChildren) {
 				license,
 				setLicense,
 				assetUrls,
+				assetFolders,
 				updateAsset,
 				removeAsset,
+				createAssetFolder,
+				removeAssetFolders,
+				moveAssets,
+				copyAssets,
 				getAssetUrl,
 				loadResourcePack,
 				saveResourcePack,
