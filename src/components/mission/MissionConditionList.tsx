@@ -26,7 +26,7 @@ const CONDITION_TYPES: { type: ConditionType; label: string }[] = [
 	{ type: 'ServeInWork', label: '请角色品尝料理' },
 	{ type: 'SubmitByTag', label: '交付包含Tag的对应物品' },
 	{ type: 'SubmitByTags', label: '交付包含多个Tag的对应物品' },
-	{ type: 'SellInWork', label: '【未实现】在工作中售卖料理' },
+	{ type: 'SellInWork', label: '【禁用】在工作中售卖料理' },
 	{ type: 'SubmitByIngredients', label: '交付包含食材的料理' },
 	{
 		type: 'CompleteSpecifiedFollowingTasks',
@@ -79,6 +79,7 @@ const SUPPORTED_CONDITION_TYPES = new Set<ConditionType>([
 	'ReachTargetCharacterKisunaLevel',
 	'BillRepayment',
 	'TalkWithCharacter',
+	'SellInWork',
 ]);
 
 // -----------------------------------------------------------------------------
@@ -224,6 +225,7 @@ function getCleanCondition(type: ConditionType): Partial<MissionCondition> {
 		case 'BillRepayment':
 			break;
 		case 'TalkWithCharacter':
+		case 'SellInWork':
 			break;
 		default:
 			break;
@@ -493,6 +495,24 @@ function TalkWithCharacterEditor({
 	);
 }
 
+function SellInWorkEditor({ condition, ctx, onUpdate }: ConditionEditorProps) {
+	return (
+		<div className="flex flex-col gap-3">
+			<SelectField
+				label="指定料理 (Food ID)"
+				value={condition.amount ?? ''}
+				placeholder="请选择料理..."
+				options={toIdOptions(ctx.allFoods)}
+				onChange={(v) =>
+					onUpdate(
+						patch({ amount: v === '' ? undefined : Number(v) })
+					)
+				}
+			/>
+		</div>
+	);
+}
+
 const CONDITION_EDITORS: Partial<
 	Record<ConditionType, (props: ConditionEditorProps) => ReactNode>
 > = {
@@ -505,6 +525,7 @@ const CONDITION_EDITORS: Partial<
 	ReachTargetCharacterKisunaLevel: ReachTargetCharacterKisunaLevelEditor,
 	BillRepayment: BillRepaymentEditor,
 	TalkWithCharacter: TalkWithCharacterEditor,
+	SellInWork: SellInWorkEditor,
 };
 
 // -----------------------------------------------------------------------------
